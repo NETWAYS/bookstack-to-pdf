@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bookstack-to-pdf"
+version = "0.1.0"
+description = "BookStack to PDF exporter using WeasyPrint, configurable for any organization."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "weasyprint>=68.1",
+    "pyyaml>=6",
+    "pydantic>=2",
+    "jinja2>=3",
+    "beautifulsoup4>=4.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pypdf>=4"]
+
+[dependency-groups]
+dev = ["pytest>=8", "pypdf>=4"]
+
+[project.scripts]
+bookstack-to-pdf = "bookstack_to_pdf.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["bookstack_to_pdf*"]
+
+[tool.setuptools.package-data]
+bookstack_to_pdf = ["templates/*.j2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,73 @@
+# bookstack-to-pdf configuration.
+# Copy this file to ./config.yaml (or /etc/bookstack-to-pdf/config.yaml,
+# ~/.config/bookstack-to-pdf/config.yaml) and edit. All paths are resolved
+# relative to the config file's directory.
+
+company:
+  name: "Your Company GmbH"
+  address_lines:
+    - "Your Street 1"
+    - "12345 Your City"
+  email: "info@example.com"
+  phone: "+49 000 0000000"
+  website: "https://example.com"
+
+branding:
+  logo: "./assets/demo-logo.png"
+  logo_height_mm: 10          # height in running header
+  cover_logo_height_mm: 10    # height on cover page (larger)
+  primary_color: "#1a3a5c"
+  text_color: "rgb(68,68,68)"
+  border_color: "#cccccc"
+  cover_background: null      # optional full-page cover bg, e.g. "./assets/background.png"
+  allow_remote_assets: false  # security: only file:// URLs are fetched unless true
+
+  # Custom fonts. Drop .woff2/.ttf into ./assets/fonts/ and reference here.
+  # Leave fonts: [] to use a system-installed family instead.
+  fonts: []
+  font_family: "Arial, Helvetica, sans-serif"
+  body_font_size: "9pt"
+  footer_font_size: "8pt"
+  cover_title_font_size: "28pt"
+  cover_metadata_font_size: "10pt"
+  cover_tag_font_size: "7.2pt"
+  toc_font_size: "10.5pt"
+  code_font_size: "9.5pt"
+
+page:
+  size: "A4"
+  margin_top_mm: 30
+  margin_bottom_mm: 30
+  margin_left_mm: 25
+  margin_right_mm: 20
+
+cover:
+  enabled: true
+  show_metadata: true
+  show_tags: true
+
+toc:
+  enabled: true
+  max_depth: 3
+
+strings:
+  toc_title: "Table of Contents"
+  page_of: "Page {page} of {pages}"
+  created_by: "Created by"
+  updated_by: "Updated by"
+  updated_at: "Updated"
+  version: "Version"
+  subject: "Subject"
+  unknown: "n/a"
+  web_label: "Web"
+  email_label: "Email"
+  phone_label: "Phone"
+
+metadata:
+  # Regex patterns to extract metadata from BookStack-rendered HTML.
+  # Defaults match BookStack's English locale.
+  created_pattern: 'Created \d{1,2} [A-Za-z]+ \d{4} \d{2}:\d{2}:\d{2} by ([\w\- ]+)'
+  updated_pattern: 'Updated (\d{1,2} [A-Za-z]+ \d{4} \d{2}:\d{2}:\d{2}) by ([\w\- ]+)'
+  version_pattern: 'Revision #(\d+)'
+  date_input_format: "%d %B %Y %H:%M:%S"
+  date_output_format: "%d.%m.%Y"

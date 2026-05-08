@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ info.title }}</title>
+</head>
+<body>
+
+{# Running elements must appear FIRST in document order so WeasyPrint activates
+   them from page 1. position:running() removes them from normal flow entirely. #}
+<div class="running-header-content">
+  {% if logo_url %}<img src="{{ logo_url }}" alt="">{% endif %}
+  <div class="running-header-rule"></div>
+</div>
+
+<div class="running-footer-left">
+  {{ cfg.company.name }}
+  {% for line in cfg.company.address_lines %}<br>{{ line }}{% endfor %}
+</div>
+
+<div class="running-footer-center">
+  {% if cfg.company.website %}<span class="footer-label">{{ cfg.strings.web_label }}:</span> {{ cfg.company.website }}<br>{% endif %}
+  {% if cfg.company.email %}<span class="footer-label">{{ cfg.strings.email_label }}:</span> {{ cfg.company.email }}<br>{% endif %}
+  {% if cfg.company.phone %}<span class="footer-label">{{ cfg.strings.phone_label }}:</span> {{ cfg.company.phone }}{% endif %}
+</div>
+
+<div class="running-footer-right">
+  <span class="page-of"></span>
+  {% if info.version %}<br><span class="footer-label">{{ cfg.strings.version }}:</span> {{ info.version }}{% endif %}
+  {% if info.updated_at %}<br><span class="footer-label">{{ cfg.strings.updated_at }}:</span> {{ info.updated_at }}{% endif %}
+</div>
+
+{% if cfg.cover.enabled %}
+<section class="cover">
+  {% if logo_url %}
+  <div class="cover-logo">
+    <img src="{{ logo_url }}" alt="logo">
+  </div>
+  {% endif %}
+
+  <div class="cover-sender">
+    {{ cfg.company.name }}{% if cfg.company.address_lines %} | {{ cfg.company.address_lines | join(' | ') }}{% endif %}
+  </div>
+
+  <div class="cover-subject-row">
+    <h1 class="cover-subject">{{ info.title }}</h1>
+  </div>
+
+  {% if cfg.cover.show_tags and info.tags %}
+  <div class="cover-tags" aria-label="Tags">
+    {% for tag in info.tags %}
+    <div class="cover-tag">
+      <span class="cover-tag-marker">#</span>{% if tag.name %}<span class="cover-tag-name">{{ tag.name }}</span>{% endif %}{% if tag.value %}<span class="cover-tag-value">{{ tag.value }}</span>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if cfg.cover.show_metadata and info.has_metadata %}
+  <dl class="cover-meta">
+    {% if info.created_by %}<dt>{{ cfg.strings.created_by }}</dt><dd>{{ info.created_by }}</dd>{% endif %}
+    {% if info.updated_by %}<dt>{{ cfg.strings.updated_by }}</dt><dd>{{ info.updated_by }}</dd>{% endif %}
+    {% if info.updated_at %}<dt>{{ cfg.strings.updated_at }}</dt><dd>{{ info.updated_at }}</dd>{% endif %}
+    {% if info.version %}<dt>{{ cfg.strings.version }}</dt><dd>{{ info.version }}</dd>{% endif %}
+  </dl>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if cfg.toc.enabled and toc_entries %}
+<nav id="toc">
+  <h2>{{ cfg.strings.toc_title }}</h2>
+  <ul>
+    {% for entry in toc_entries %}
+    <li class="toc-l{{ entry.level }}">
+      <a href="#{{ entry.anchor }}">
+        <span class="toc-text">{{ entry.text }}</span>
+        <span class="toc-leader"></span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+
+<main id="content">
+  {{ info.body_html | safe }}
+</main>
+
+</body>
+</html>

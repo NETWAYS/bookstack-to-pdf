@@ -1,0 +1,432 @@
+{# Paged-media layout for cover, table of contents, running header/footer, and body content. #}
+
+{# Missing local font files are skipped so WeasyPrint never sees src: url("None"). #}
+{% for font in cfg.branding.fonts %}
+{% for f in font.files %}
+{% set font_url = resolve(f.src) %}
+{% if font_url %}
+{% for weight in f.css_weights %}
+@font-face {
+  font-family: "{{ font.family }}";
+  font-weight: {{ weight }};
+  font-style: {{ f.style }};
+  src: url("{{ font_url }}");
+}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+/* Page */
+@page {
+  size: {{ cfg.page.size }};
+  margin-top: {{ cfg.page.margin_top_mm }}mm;
+  margin-bottom: {{ cfg.page.margin_bottom_mm }}mm;
+  margin-left: {{ cfg.page.margin_left_mm }}mm;
+  margin-right: {{ cfg.page.margin_right_mm }}mm;
+  background-color: #fff;
+  @top-left {
+    content: element(running-header);
+    vertical-align: bottom;
+    padding-bottom: 5mm;
+    width: 33.33%;
+  }
+  @top-center {
+    content: "";
+    vertical-align: bottom;
+    padding-bottom: 5mm;
+    width: 33.33%;
+  }
+  @top-right {
+    content: "";
+    vertical-align: bottom;
+    padding-bottom: 5mm;
+    width: 33.34%;
+  }
+  @bottom-left {
+    content: element(running-footer-left);
+    vertical-align: top;
+    padding-top: 0;
+    width: 33.33%;
+  }
+  @bottom-center {
+    content: element(running-footer-center);
+    vertical-align: top;
+    padding-top: 0;
+    width: 33.33%;
+    text-align: left;
+  }
+  @bottom-right {
+    content: element(running-footer-right);
+    vertical-align: top;
+    padding-top: 0;
+    width: 33.34%;
+    text-align: right;
+  }
+}
+
+/* Cover page */
+@page cover-page {
+  margin: 0;
+  {% if cover_background_url %}
+  background-image: url("{{ cover_background_url }}");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  {% else %}
+  background-image: none;
+  {% endif %}
+
+  @top-left    { content: none; border: none; }
+  @top-center  { content: none; border: none; }
+  @top-right   { content: none; border: none; }
+  @bottom-left   { content: none; border: none; }
+  @bottom-center { content: none; border: none; }
+  @bottom-right  { content: none; border: none; }
+}
+
+/* Base */
+html, body {
+  font-family: {{ cfg.branding.font_family }};
+  font-size: {{ cfg.branding.body_font_size }};
+  color: {{ cfg.branding.text_color }};
+  line-height: 1.45;
+  margin: 0;
+  padding: 0;
+}
+
+#content {
+  padding-top: 3mm;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: {{ cfg.branding.primary_color }};
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+a {
+  color: {{ cfg.branding.primary_color }};
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Cover */
+.cover {
+  page: cover-page;
+  page-break-after: always;
+  break-after: page;
+  padding: 25mm 22mm;
+  height: 247mm;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.cover-logo {
+  display: block;
+  margin-bottom: 10mm;
+}
+
+.cover-logo img {
+  height: {{ cfg.branding.cover_logo_height_mm }}mm;
+  display: block;
+}
+
+.cover-sender {
+  font-size: {{ cfg.branding.footer_font_size }};
+  color: {{ cfg.branding.text_color }};
+  border-bottom: 1px solid {{ cfg.branding.border_color }};
+  padding-bottom: 1mm;
+  margin-bottom: 35mm;
+}
+
+.cover-subject-row {
+  margin-bottom: 8mm;
+}
+
+.cover-subject {
+  font-size: {{ cfg.branding.cover_title_font_size }};
+  font-weight: 700;
+  line-height: 1.15;
+  color: {{ cfg.branding.primary_color }};
+  margin: 0;
+}
+
+.cover-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3mm;
+  margin: 0 0 8mm;
+}
+
+.cover-tag {
+  display: inline-flex;
+  align-items: baseline;
+  max-width: 65mm;
+  padding: 0;
+  color: {{ cfg.branding.text_color }};
+  font-size: {{ cfg.branding.cover_tag_font_size }};
+  line-height: 1.15;
+}
+
+.cover-tag-marker {
+  color: #999;
+  margin-right: 0.3mm;
+}
+
+.cover-tag-name {
+  font-weight: 700;
+  color: #777;
+}
+
+.cover-tag-name::after {
+  content: "/";
+  color: #aaa;
+  margin: 0 0.7mm;
+}
+
+.cover-tag-value {
+  font-weight: 700;
+  color: {{ cfg.branding.primary_color }};
+}
+
+.cover-meta {
+  display: grid;
+  grid-template-columns: 32mm 1fr;
+  gap: 1.5mm 4mm;
+  font-size: {{ cfg.branding.cover_metadata_font_size }};
+  margin-top: 4mm;
+}
+
+.cover-meta dt {
+  font-weight: 600;
+  color: {{ cfg.branding.text_color }};
+  margin: 0;
+}
+
+.cover-meta dd {
+  margin: 0;
+  color: {{ cfg.branding.text_color }};
+}
+
+/* Table of contents */
+nav#toc {
+  page-break-after: always;
+  break-after: page;
+}
+
+nav#toc h2 {
+  font-size: 16pt;
+  margin-bottom: 6mm;
+}
+
+nav#toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav#toc li {
+  margin: 0;
+  font-size: {{ cfg.branding.toc_font_size }};
+}
+
+nav#toc a {
+  display: flex;
+  align-items: baseline;
+  color: inherit;
+}
+
+nav#toc .toc-text {
+  white-space: nowrap;
+}
+
+nav#toc .toc-leader {
+  flex: 1;
+  border-bottom: 1px dotted {{ cfg.branding.border_color }};
+  margin: 0 2mm;
+  transform: translateY(-2px);
+}
+
+nav#toc a::after {
+  content: target-counter(attr(href), page);
+  white-space: nowrap;
+  margin-left: 2mm;
+}
+
+nav#toc .toc-l2 {
+  padding-left: 6mm;
+  font-size: calc({{ cfg.branding.toc_font_size }} * 0.95);
+}
+
+nav#toc .toc-l3 {
+  padding-left: 12mm;
+  font-size: calc({{ cfg.branding.toc_font_size }} * 0.9);
+}
+
+/* Running header */
+.running-header-content {
+  position: running(running-header);
+  text-align: left;
+  white-space: nowrap;
+  overflow: visible;
+  width: 300%;
+}
+
+.running-header-content img {
+  height: {{ cfg.branding.logo_height_mm }}mm;
+  max-width: none;
+  width: auto;
+}
+
+.running-header-rule {
+  border-bottom: 1px solid {{ cfg.branding.border_color }};
+  margin-top: 4mm;
+  width: 100%;
+}
+
+/* Running footer */
+.running-footer-left,
+.running-footer-center,
+.running-footer-right {
+  font-size: {{ cfg.branding.footer_font_size }};
+  color: {{ cfg.branding.text_color }};
+  line-height: 1.22;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 3mm 0 0;
+  border-top: 1px solid {{ cfg.branding.border_color }};
+  padding-top: 3.5mm;
+}
+
+.running-footer-left {
+  position: running(running-footer-left);
+  text-align: left;
+}
+
+.running-footer-center {
+  position: running(running-footer-center);
+  text-align: left;
+  padding-left: 7mm;
+}
+
+.running-footer-right {
+  position: running(running-footer-right);
+  text-align: right;
+}
+
+.running-footer-right .page-of::before {
+  content: {{ page_of_expr }};
+}
+
+.footer-label {
+  color: #888;
+}
+
+/* BookStack content */
+#content h1,
+#content h2 {
+  margin-top: 8mm;
+}
+
+#content h3 {
+  margin-top: 4.5mm;
+}
+
+#content .callout {
+  display: block;
+  margin: 4mm 0 5mm;
+  padding: 3mm 4mm;
+  border-left: 1.2mm solid {{ cfg.branding.border_color }};
+  background: #f5f7f9;
+  color: {{ cfg.branding.text_color }};
+  break-inside: avoid;
+}
+
+#content p.callout {
+  margin: 4mm 0 5mm;
+}
+
+#content .callout.info {
+  border-left-color: #0288d1;
+  background: #e8f5fc;
+}
+
+#content .callout.success {
+  border-left-color: #2e7d32;
+  background: #edf7ed;
+}
+
+#content .callout.warning {
+  border-left-color: #cf6d17;
+  background: #fff4e5;
+}
+
+#content .callout.danger {
+  border-left-color: #b3261e;
+  background: #fceeee;
+}
+
+#content .callout > :first-child {
+  margin-top: 0;
+}
+
+#content .callout > :last-child {
+  margin-bottom: 0;
+}
+
+#content table {
+  border-collapse: collapse;
+  margin: 4mm 0;
+  width: 100%;
+}
+
+#content tr {
+  break-inside: avoid;
+}
+
+#content table th,
+#content table td {
+  border: 1px solid {{ cfg.branding.border_color }};
+  padding: 2mm 3mm;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+#content code,
+#content pre {
+  font-family: "Courier New", monospace;
+  font-size: {{ cfg.branding.code_font_size }};
+  overflow-wrap: anywhere;
+}
+
+#content pre {
+  background: #f5f5f5;
+  padding: 3mm;
+  border-radius: 2mm;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Export-only BookStack metadata */
+.tag-item[data-name="Schlagworte"] {
+  display: none;
+}
+
+.entity-meta,
+.activity-list,
+.audit-log,
+.page-meta,
+.entity-list-item svg,
+.activity-item {
+  display: none;
+}
+
+#content svg {
+  max-width: 2em;
+  max-height: 2em;
+}

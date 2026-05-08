@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample BookStack Page</title>
+</head>
+<body>
+  <h1>Sample BookStack Page</h1>
+  <p>Created 18 April 2025 09:30:00 by Jane Doe</p>
+  <p>Updated 21 April 2025 14:15:00 by John Smith</p>
+  <p>Revision #7</p>
+
+  <h2>Introduction</h2>
+  <p>This is a sample document used by the bookstack-to-pdf test suite.
+  It exercises the cover page, table of contents, headings, and a code block.</p>
+
+  <h2>Configuration</h2>
+  <p>BookStack reads <code>EXPORT_PDF_COMMAND</code> from <code>.env</code>:</p>
+  <pre>EXPORT_PDF_COMMAND="/usr/local/bin/bookstack-to-pdf {input_html_path} {output_pdf_path}"</pre>
+
+  <h3>Permissions</h3>
+  <p>Make sure the binary is executable by the BookStack process user.</p>
+
+  <h2>Tables</h2>
+  <table>
+    <thead>
+      <tr><th>Field</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>company.name</td><td>Displayed in cover and footer.</td></tr>
+      <tr><td>branding.logo</td><td>Local path to the logo image.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Closing</h2>
+  <p>End of sample document.</p>
+</body>
+</html>
