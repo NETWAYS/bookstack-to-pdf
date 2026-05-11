@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>{{ info.title }}</title>
+  <meta name="generator" content="bookstack-to-pdf">
+  {% if info.created_by %}<meta name="author" content="{{ info.created_by }}">{% endif %}
+  <meta name="description" content="{{ info.title }}">
 </head>
 <body>
 
