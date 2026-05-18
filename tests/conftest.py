@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: MIT
 # Skip render tests when WeasyPrint system libraries (pango/gobject) are not installed.
 collect_ignore = []
 

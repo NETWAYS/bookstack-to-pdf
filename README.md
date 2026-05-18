@@ -369,4 +369,4 @@ Increase `EXPORT_PDF_COMMAND_TIMEOUT` only after checking for unusually large pa
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
