@@ -138,6 +138,12 @@ def render(input_html: Path, output_pdf: Path, cfg: Config) -> None:
     info = metadata.extract(soup, cfg.metadata, unknown=cfg.strings.unknown)
     logger.debug("Extracted %d BookStack tag(s)", len(info.tags))
 
+    # Optionally swap the company block based on a configured tag (e.g. "Bereich").
+    resolved_company = cfg.company.for_tags(info.tags)
+    if resolved_company is not cfg.company:
+        logger.info("Company resolved to %r via tag %r", resolved_company.name, cfg.company.by_tag.tag)
+        cfg.company = resolved_company
+
     body_soup = BeautifulSoup(info.body_html, "html.parser")
     _remove_export_only_sections(body_soup)
     _remove_empty_spacer_blocks(body_soup)

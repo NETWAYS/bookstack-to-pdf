@@ -88,6 +88,39 @@ company:
 
 These values appear on the cover and in the running footer.
 
+#### Dynamic Company By Tag
+
+If your BookStack hosts documentation for several legal entities, you can pick the company from a BookStack tag instead of hard-coding a single one. This is fully optional: leave `by_tag` out and the static `company` block above is always used.
+
+When a document carries a tag whose name equals `tag` (for example `Bereich`) and whose value is listed under `map`, the matching fields override the base company. Any field you omit in a mapping is inherited from the base `company` block, so you can override just the name or a full address set.
+
+```yaml
+company:
+  name: "NETWAYS GmbH"
+  address_lines:
+    - "Deutschherrnstraße 15-19"
+    - "90429 Nürnberg"
+  email: "info@netways.de"
+  phone: "+49 911 92885-0"
+  website: "https://www.netways.de"
+
+  by_tag:
+    tag: "Bereich"             # name of the BookStack tag to inspect
+    case_sensitive: false      # tag name and value are matched case-insensitively
+    map:
+      "Professional Services":
+        name: "NETWAYS Professional Services GmbH"
+        email: "ps@netways.de"   # only overrides email; address etc. is inherited
+      "Web Services":
+        name: "NETWAYS Web Services GmbH"
+```
+
+With this config, a page tagged `Bereich: Professional Services` is rendered with `NETWAYS Professional Services GmbH` on the cover and footer, while keeping the base address, phone, and website. A page tagged `Bereich: Web Services` only changes the name. A page with no matching `Bereich` tag falls back to the base `NETWAYS GmbH`.
+
+The first matching tag wins. Matching is case-insensitive by default; set `case_sensitive: true` to require exact casing on both the tag name and value.
+
+This feature relies on the export HTML actually containing the tag markup. See [BookStack Page Export Template](#bookstack-page-export-template) for how to expose tags, and the [Tags do not appear on the cover](#troubleshooting) troubleshooting steps to confirm they are present.
+
 ### Branding And Assets
 
 ```yaml

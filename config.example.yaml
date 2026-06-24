@@ -12,6 +12,20 @@ company:
   phone: "+49 000 0000000"
   website: "https://example.com"
 
+  # Optional: pick the company from a BookStack tag. Disabled unless `by_tag`
+  # is present. When a document has a tag named `tag` (e.g. "Bereich") whose
+  # value is listed under `map`, the fields below override the base company.
+  # Omitted fields (address, email, ...) inherit from the block above.
+  # by_tag:
+  #   tag: "Bereich"
+  #   case_sensitive: false       # value match; names are matched the same way
+  #   map:
+  #     "Professional Services":
+  #       name: "NETWAYS Professional Services GmbH"
+  #       email: "ps@netways.de"
+  #     "Web Services":
+  #       name: "NETWAYS Web Services GmbH"
+
 branding:
   logo: "./assets/demo-logo.png"
   logo_height_mm: 10          # height in running header

@@ -9,12 +9,67 @@ import yaml
 from pydantic import BaseModel, Field
 
 
+class CompanyOverride(BaseModel):
+    """Company fields that may be swapped in for a matching tag value.
+
+    Every field is optional; whatever is left unset inherits from the base
+    `company` block, so a mapping can override just the name or the full set."""
+
+    name: Optional[str] = None
+    address_lines: Optional[list[str]] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    website: Optional[str] = None
+
+
+class CompanyByTag(BaseModel):
+    """Optional: choose company details from a BookStack tag.
+
+    When a document carries a tag whose name equals `tag` and whose value is a
+    key in `map`, the matching `CompanyOverride` is applied on top of the base
+    company. Disabled by default — leaving `company.by_tag` unset (or `tag`
+    empty) keeps the static company block."""
+
+    tag: str = ""
+    case_sensitive: bool = False
+    map: dict[str, CompanyOverride] = Field(default_factory=dict)
+
+
 class Company(BaseModel):
     name: str = "Your Company"
     address_lines: list[str] = Field(default_factory=list)
     email: str = ""
     phone: str = ""
     website: str = ""
+    by_tag: Optional[CompanyByTag] = None
+
+    def for_tags(self, tags: list[dict[str, str]]) -> "Company":
+        """Return the effective company for a document's tags.
+
+        Applies the first matching `by_tag` override; returns self unchanged
+        when the feature is unconfigured or no tag matches. Safe to call
+        unconditionally."""
+        rule = self.by_tag
+        if not rule or not rule.tag.strip() or not rule.map:
+            return self
+
+        def norm(value: str) -> str:
+            value = value.strip()
+            return value if rule.case_sensitive else value.casefold()
+
+        wanted_name = norm(rule.tag)
+        value_to_override = {norm(key): override for key, override in rule.map.items()}
+
+        for tag in tags:
+            if norm(tag.get("name") or "") != wanted_name:
+                continue
+            override = value_to_override.get(norm(tag.get("value") or ""))
+            if override is None:
+                continue
+            data = self.model_dump()
+            data.update(override.model_dump(exclude_none=True))
+            return Company(**data)
+        return self
 
 
 class FontFile(BaseModel):

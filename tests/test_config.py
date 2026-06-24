@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from bookstack_to_pdf import config as config_module
-from bookstack_to_pdf.config import Config
+from bookstack_to_pdf.config import Company, Config
 
 
 def test_default_config_loads_without_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -104,6 +104,74 @@ branding:
     cfg = config_module.load(path=str(yaml))
     assert cfg.branding.fonts[0].files[0].weight == "100 900"
     assert cfg.branding.fonts[0].files[0].css_weights == [100, 200, 300, 400, 500, 600, 700, 800, 900]
+
+
+def test_company_for_tags_noop_without_by_tag():
+    company = Company(name="NETWAYS GmbH")
+    assert company.for_tags([{"name": "Bereich", "value": "Professional Services"}]) is company
+
+
+def test_company_for_tags_overrides_on_match():
+    company = Company(
+        name="NETWAYS GmbH",
+        email="info@netways.de",
+        by_tag={
+            "tag": "Bereich",
+            "map": {
+                "Professional Services": {
+                    "name": "NETWAYS Professional Services GmbH",
+                    "email": "ps@netways.de",
+                }
+            },
+        },
+    )
+    resolved = company.for_tags([{"name": "Bereich", "value": "Professional Services"}])
+    assert resolved.name == "NETWAYS Professional Services GmbH"
+    assert resolved.email == "ps@netways.de"
+
+
+def test_company_for_tags_inherits_unset_fields():
+    company = Company(
+        name="NETWAYS GmbH",
+        email="info@netways.de",
+        phone="+49 911 0000000",
+        by_tag={"tag": "Bereich", "map": {"Web Services": {"name": "NETWAYS Web Services GmbH"}}},
+    )
+    resolved = company.for_tags([{"name": "Bereich", "value": "Web Services"}])
+    assert resolved.name == "NETWAYS Web Services GmbH"
+    assert resolved.email == "info@netways.de"  # inherited from base
+    assert resolved.phone == "+49 911 0000000"
+
+
+def test_company_for_tags_case_insensitive_by_default():
+    company = Company(
+        name="NETWAYS GmbH",
+        by_tag={"tag": "bereich", "map": {"professional services": {"name": "PS GmbH"}}},
+    )
+    resolved = company.for_tags([{"name": "Bereich", "value": "Professional Services"}])
+    assert resolved.name == "PS GmbH"
+
+
+def test_company_for_tags_case_sensitive_no_match():
+    company = Company(
+        name="NETWAYS GmbH",
+        by_tag={
+            "tag": "Bereich",
+            "case_sensitive": True,
+            "map": {"Professional Services": {"name": "PS GmbH"}},
+        },
+    )
+    resolved = company.for_tags([{"name": "Bereich", "value": "professional services"}])
+    assert resolved.name == "NETWAYS GmbH"  # value casing differs, no match
+
+
+def test_company_for_tags_no_matching_tag_returns_self():
+    company = Company(
+        name="NETWAYS GmbH",
+        by_tag={"tag": "Bereich", "map": {"Professional Services": {"name": "PS GmbH"}}},
+    )
+    resolved = company.for_tags([{"name": "Region", "value": "Nürnberg"}])
+    assert resolved.name == "NETWAYS GmbH"
 
 
 def test_font_weight_accepts_variable_alias(tmp_path: Path):
