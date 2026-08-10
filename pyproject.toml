@@ -18,10 +18,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pypdf>=6.14.2"]
+dev = ["pytest>=8", "pypdf>=6.15.0"]
 
 [dependency-groups]
-dev = ["pytest>=8", "pypdf>=6.14.2"]
+dev = ["pytest>=8", "pypdf>=6.15.0"]
 
 [project.scripts]
 bookstack-to-pdf = "bookstack_to_pdf.__main__:main"
